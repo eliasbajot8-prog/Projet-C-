@@ -32,11 +32,11 @@ P_Q_System WindkesselModel::rhs(double t, const P_Q_System &X) const
 
     double C = compliance(X.P);
 
-    // dP/dt = (Q - P/Rp) / C
+    // 1) Conservation au noeud : C dP/dt = Qin - P/Rp
     dX.P = (Qin - X.P / p.getRp()) / C;
 
-    // dQ/dt = (Pin - P - Rc Q) / Lw
-    dX.Q = (Pin(t) - X.P - p.getRc() * Qin) / p.getLw();
+    // 2) Inertance : Lw dQ/dt = Pin - P - Rc * Q
+    dX.Q = (Pin(t) - X.P - p.getRc() * X.Q) / p.getLw();
 
     return dX;
 }

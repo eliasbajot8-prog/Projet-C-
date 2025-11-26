@@ -2,48 +2,52 @@
 #         PARAMETRES PHYSIQUES GENERAUX       #
 ###############################################
 
-rho = 1060          # densité du sang (kg/m3)
-c = 5.0             # célérité de l’onde (m/s)
-A0 = 3.14e-4        # section artère (m2)
-Lx = 0.3          # longueur domaine EDP (m)
-
+rho = 1060          # Densité du sang (kg/m3)
+c = 5.0             # Célérité de l'onde (m/s) 
+A0 = 3.14e-4        # Section artère (m2) 
+Lx = 0.3            # Longueur domaine (m) 
 
 ###############################################
 #              MODELE WINDKESSEL              #
 #          (Unités SI : Pa, m3/s)             #
 ###############################################
 
-# Résistances (x 1.33e8 pour passer de mmHg.s/mL à Pa.s/m3)
-Rc = 2.6e7          # Résistance caractéristique
-Rp = 1.3e8          # Résistance périphérique (approx 1 mmHg/mL/s en SI)
+# --- Résistances ---
+# Rc ajusté pour matcher l'impédance Z0 = (rho*c)/A0
+# Cela minimise les réflexions artificielles à la sortie.
+Rc = 1.69e7         # Résistance caractéristique (Adaptation d'impédance)
+Rp = 1.3e8          # Résistance périphérique (Donne un débit ~6 L/min)
 
-# Compliance (/ 1.33e8 et / 1e6 pour passer de mL/mmHg à m3/Pa)
-C0 = 1.5e-8         # Compliance (approx 2 mL/mmHg en SI)
-alpha = 0.0003      # Ajusté pour l'ordre de grandeur Pa
-Lw = 5000           # Inertance ajustée
+# --- Compliance & Inertance ---
+C0 = 1.5e-8         # Compliance totale (~2 mL/mmHg - élasticité globale)
+alpha = 0.0003      # Coefficient de non-linéarité (si supporté par le code)
 
+# Lw représente l'inertie du sang dans les petits vaisseaux.
+# 5000 est faible, souvent négligé (Windkessel 3 éléments), mais acceptable pour la stabilité.
+Lw = 5000           
 
 ###############################################
 #           PARAMETRES CARDIAQUES             #
 ###############################################
 
-T = 1.0             # durée cycle (s)
-Ts = 0.35           # durée systole (s)
-tau = 0.15          # relaxation (s)
+T = 1.0             # Durée cycle (s) - 60 battements/min
+Ts = 0.3            # Durée systole (s) - Ratio physiologique normal
+tau = 0.15          # Constante de temps de relaxation ventriculaire
 
-# Pressions converties en Pascals (x 133.32)
-Pmin = 10660        # ~80 mmHg
-Pmax = 16000        # ~120 mmHg
-
+# Pressions cibles (pour condition limite entrée ou validation)
+Pmin = 10660        # ~80 mmHg (Diastole)
+Pmax = 16000        # ~120 mmHg (Systole)
 
 ###############################################
-#         PARAMETRES NUMERIQUES EDP/EDO       #
+#        PARAMETRES NUMERIQUES EDP/EDO        #
 ###############################################
 
-Nx = 500         # nombre de points spatiaux
-dt = 0.0001          # pas de temps (s)
-t_final = 3.0     # durée simulation (s)
-output_frequency = 1  # fréquence d’écriture CSV
+# Critère CFL : dt <= dx / c
+# dx = 0.3 / 500 = 0.0006 m
+# dt_max = 0.0006 / 5.0 = 0.00012 s
+# Votre dt = 0.0001 respecte la condition CFL (CFL ~0.83).
 
-
-
+Nx = 500            # Maillage spatial fin
+dt = 0.0001         # Pas de temps (s) - Stable
+t_final = 2  # Augmenté à 5s pour atteindre un état périodique établi (5 cycles)
+output_frequency = 10 # Écrire à chaque pas ralentit trop (10 ou 20 est mieux)

@@ -1,31 +1,92 @@
-import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
-import imageio
+import matplotlib.animation as animation
 
-data = np.loadtxt("data/P_xt.csv")
+# --- PARAMÈTRES DE VITESSE ---
+FILENAME = 'data/P_xt.csv'
+OUTPUT_GIF = 'pression_lente.gif'
 
-x = data[:,0]
-t = data[:,1]
-p = data[:,2]
+# VITESSE DE LECTURE
+FPS = 15           # Images par seconde (vitesse de défilement)
 
-unique_times = np.unique(t)
+# FLUIDITÉ / DURÉE
+# Plus ce chiffre est petit, plus l'animation est lente et fluide.
+# STEP = 1  : Utilise toutes les données (Très lent, fichier lourd)
+# STEP = 5  : Prend 1 point sur 5 (Bon compromis pour ralentir)
+# STEP = 20 : Prend 1 point sur 20 (Rapide)
+STEP = 3         
 
-frames = []
+def create_slow_animation():
+    print("Chargement des données...")
+    # Lecture optimisée
+    df = pd.read_csv(FILENAME, sep='\s+', header=None, names=['x', 't', 'P'])
+    df = df.sort_values(by=['t', 'x'])
+    
+    # Récupération des temps uniques
+    all_times = df['t'].unique()
+    
+    # Sous-échantillonnage
+    selected_times = all_times[::STEP]
+    
+    # Estimation de la durée
+    duree_estimee = len(selected_times) / FPS
+    print(f"--- INFO ANIMATION ---")
+    print(f"Nombre d'images : {len(selected_times)}")
+    print(f"Vitesse lecture : {FPS} images/s")
+    print(f"Durée vidéo     : {duree_estimee:.1f} secondes")
+    print(f"----------------------")
 
-for ti in unique_times[::80]:  # 1 image sur 80 pour alléger le GIF
-    mask = t == ti
+    # --- Configuration du graphique ---
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Fixer les axes est CRUCIAL pour que ça ne saute pas
+    x_min, x_max = df['x'].min(), df['x'].max()
+    p_min, p_max = df['P'].min(), df['P'].max()
+    marge = (p_max - p_min) * 0.1
+    
+    ax.set_xlim(x_min, x_max)
+    ax.set_ylim(p_min - marge, p_max + marge)
+    
+    ax.set_xlabel('Position le long de l\'artère (m)')
+    ax.set_ylabel('Pression (Pa)')
+    ax.grid(True, linestyle='--', alpha=0.6)
+    
+    # La courbe
+    line, = ax.plot([], [], lw=2.5, color='#d62728', label='Pression sanguine')
+    ax.legend(loc='upper right')
+    
+    # Texte du temps
+    time_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
 
-    plt.figure()
-    plt.plot(x[mask], p[mask])
-    plt.xlabel("x (m)")
-    plt.ylabel("P(x,t)")
-    plt.ylim(p.min(), p.max())
-    plt.title(f"t = {ti:.3f} s")
-    plt.grid()
+    def init():
+        line.set_data([], [])
+        time_text.set_text('')
+        return line, time_text
 
-    plt.savefig("tmp.png")
-    plt.close()
+    def update(frame_time):
+        # Filtre rapide
+        subset = df[df['t'] == frame_time]
+        
+        line.set_data(subset['x'], subset['P'])
+        time_text.set_text(f'Temps : {frame_time:.3f} s')
+        ax.set_title(f"Propagation de l'onde de pression (Ralenti)")
+        return line, time_text
 
-    frames.append(imageio.imread("tmp.png"))
+    print("Génération en cours (patience)...")
+    
+    # Création de l'animation
+    ani = animation.FuncAnimation(
+        fig, 
+        update, 
+        frames=selected_times, 
+        init_func=init, 
+        blit=True
+    )
 
-imageio.mimsave("P_wave.gif", frames, duration=0.05)
+    # Sauvegarde
+    print(f"Sauvegarde du fichier '{OUTPUT_GIF}'...")
+    ani.save(OUTPUT_GIF, writer='pillow', fps=FPS)
+    print("Terminé ! Vous pouvez ouvrir le GIF.")
+
+if __name__ == "__main__":
+    create_slow_animation()

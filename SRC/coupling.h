@@ -22,6 +22,12 @@ public:
     double getP_wk() const { return X_wk.P; }
     double getQ_wk() const { return X_wk.Q; }
 
+    double getQ_out_PDE() const
+    {
+        double U_out = pde.getU().back(); // Vitesse au dernier point
+        return params.getA0() * U_out;    // Débit = Section * Vitesse
+    }
+
 private:
     Parameters params;
 
