@@ -57,8 +57,42 @@ int main(int argc, char **argv)
     }
     file_xt.close();
 
+    // On test le winkessel seul pour comparaison
+    WindkesselModel wk_model(params);
+    OdeSolver ode_solver(dt);
+    P_Q_System X_wk;
+    t = 0.0;
+    std::vector<double> t_wk_save, P_wk_alone_save, Q_wk_alone_save;
+
+    X_wk.P = params.getPmin();
+    X_wk.Q = 0.0;
+
+    while (t < t_final)
+    {
+        double P_coeur = wk_model.Pin(t);
+        double Q_in = 0.0;
+        double t_loc = std::fmod(t, params.getT());
+
+        if (t_loc < params.getTs())
+        {
+            Q_in = 2.0e-4 * std::sin(M_PI * t_loc / params.getTs());
+        }
+
+        wk_model.set_Q_in(Q_in);
+        X_wk = ode_solver.RK4_step(t, X_wk, wk_model);
+
+        t_wk_save.push_back(t);
+        P_wk_alone_save.push_back(X_wk.P);
+        Q_wk_alone_save.push_back(X_wk.Q);
+
+        t += dt;
+    }
+
     write_two_vectors_csv("data/P_wk_coupled.csv", t_save, P_wk_save);
     write_two_vectors_csv("data/Q_wk_coupled.csv", t_save, Q_wk_save);
+
+    write_two_vectors_csv("data/P_wk_alone.csv", t_wk_save, P_wk_alone_save);
+    write_two_vectors_csv("data/Q_wk_alone.csv", t_wk_save, Q_wk_alone_save);
 
     std::cout << "[OK] Couplage PDE / Windkessel terminé." << std::endl;
 

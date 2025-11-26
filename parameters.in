@@ -10,26 +10,30 @@ Lx = 0.3          # longueur domaine EDP (m)
 
 ###############################################
 #              MODELE WINDKESSEL              #
-#              (4 éléments RCRLw)             #
+#          (Unités SI : Pa, m3/s)             #
 ###############################################
 
-Rc = 0.2            # résistance caractéristique (proximale)
-Rp = 1.0            # résistance périphérique (distale)
-C0 = 2.0            # compliance de référence (mL/mmHg)
-alpha = 0.05        # non-linéarité de la compliance
-Lw = 0.005          # inertance (kg/m4)
+# Résistances (x 1.33e8 pour passer de mmHg.s/mL à Pa.s/m3)
+Rc = 2.6e7          # Résistance caractéristique
+Rp = 1.3e8          # Résistance périphérique (approx 1 mmHg/mL/s en SI)
+
+# Compliance (/ 1.33e8 et / 1e6 pour passer de mL/mmHg à m3/Pa)
+C0 = 1.5e-8         # Compliance (approx 2 mL/mmHg en SI)
+alpha = 0.0003      # Ajusté pour l'ordre de grandeur Pa
+Lw = 5000           # Inertance ajustée
 
 
 ###############################################
 #           PARAMETRES CARDIAQUES             #
 ###############################################
 
-T = 1.0             # durée cycle cardiaque (s)
-Ts = 0.35           # durée systole
-tau = 0.15          # constante relaxation diastole (s)
+T = 1.0             # durée cycle (s)
+Ts = 0.35           # durée systole (s)
+tau = 0.15          # relaxation (s)
 
-Pmin = 10           # pression minimale (mmHg)
-Pmax = 120          # pression maximale (mmHg)
+# Pressions converties en Pascals (x 133.32)
+Pmin = 10660        # ~80 mmHg
+Pmax = 16000        # ~120 mmHg
 
 
 ###############################################
@@ -39,4 +43,7 @@ Pmax = 120          # pression maximale (mmHg)
 Nx = 500         # nombre de points spatiaux
 dt = 0.0001          # pas de temps (s)
 t_final = 3.0     # durée simulation (s)
-output_frequency = 10  # fréquence d’écriture CSV
+output_frequency = 1  # fréquence d’écriture CSV
+
+
+
