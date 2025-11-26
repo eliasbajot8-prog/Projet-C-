@@ -35,6 +35,7 @@ void Coupling::step(double t)
     X_wk = ode.RK4_step(t, X_wk, wk);
 
     double P_wk = X_wk.P;
+    double Q_wk = X_wk.Q;
 
     // -----------------------------
     // 4. Conditions limites pour le PDE

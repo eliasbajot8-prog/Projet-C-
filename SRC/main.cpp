@@ -32,26 +32,28 @@ int main(int argc, char **argv)
         std::cerr << "ERREUR : impossible de créer data/P_xt.csv" << std::endl;
         return 1;
     }
+    int step_count = 0;
+    int output_freq = params.getOutputFrequency();
 
     while (t < t_final)
     {
         system.step(t);
-
-        const auto &X = system.getPde().getX();
-        const auto &P = system.getPde().getP();
-        int Nx = X.size();
-
-        for (int i = 0; i < Nx; ++i)
+        bool write_step = (step_count % output_freq == 0);
+        if (write_step)
         {
-            file_xt << X[i] << " " << t << " " << P[i] << "\n";
+            const auto &X = system.getPde().getX();
+            const auto &P = system.getPde().getP();
+            for (size_t i = 0; i < X.size(); ++i)
+                file_xt << X[i] << " " << t << " " << P[i] << "\n";
+            file_xt << "\n"; // séparation entre chaque instant (important pour gnuplot)
         }
-        file_xt << "\n"; // séparation entre chaque instant (important pour gnuplot)
         // Sauvegarde des données WK
         t_save.push_back(t);
         P_wk_save.push_back(system.getP_wk());
         Q_wk_save.push_back(system.getQ_wk());
 
         t += dt;
+        step_count++;
     }
     file_xt.close();
 

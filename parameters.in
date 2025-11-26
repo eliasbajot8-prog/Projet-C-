@@ -5,7 +5,7 @@
 rho = 1060          # densité du sang (kg/m3)
 c = 5.0             # célérité de l’onde (m/s)
 A0 = 3.14e-4        # section artère (m2)
-Lx = 1.0           # longueur domaine EDP (m)
+Lx = 0.3          # longueur domaine EDP (m)
 
 
 ###############################################
@@ -36,7 +36,7 @@ Pmax = 120          # pression maximale (mmHg)
 #         PARAMETRES NUMERIQUES EDP/EDO       #
 ###############################################
 
-Nx = 500            # nombre de points spatiaux
+Nx = 500         # nombre de points spatiaux
 dt = 0.0001          # pas de temps (s)
 t_final = 3.0     # durée simulation (s)
 output_frequency = 10  # fréquence d’écriture CSV
