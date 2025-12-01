@@ -36,12 +36,11 @@ void Coupling::step(double t)
 
     double P_wk = X_wk.P;
     double Q_wk = X_wk.Q;
-
     // -----------------------------
     // 4. Conditions limites pour le PDE
     // -----------------------------
-    double P_left = wk.Pin(t); // pression d'entrée (cœur)
-    double P_right = P_wk;     // pression calculée par le WK
+    double P_left = wk.Pin(t);                      // pression d'entrée (cœur)
+    double P_right = P_wk + params.getRc() * Q_out; // pression calculée par le WK
 
     // -----------------------------
     // 5. Avancer la PDE

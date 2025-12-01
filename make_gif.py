@@ -14,7 +14,7 @@ FPS = 15           # Images par seconde (vitesse de défilement)
 # STEP = 1  : Utilise toutes les données (Très lent, fichier lourd)
 # STEP = 5  : Prend 1 point sur 5 (Bon compromis pour ralentir)
 # STEP = 20 : Prend 1 point sur 20 (Rapide)
-STEP = 3         
+STEP = 20
 
 def create_slow_animation():
     print("Chargement des données...")

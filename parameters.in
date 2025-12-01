@@ -1,53 +1,27 @@
-###############################################
-#         PARAMETRES PHYSIQUES GENERAUX       #
-###############################################
+rho = 1060
+c = 5.0
+A0 = 3.14e-4
+Lx = 0.3
 
-rho = 1060          # Densité du sang (kg/m3)
-c = 5.0             # Célérité de l'onde (m/s) 
-A0 = 3.14e-4        # Section artère (m2) 
-Lx = 0.3            # Longueur domaine (m) 
+# --- Adaptation d'impédance (Z0 = rho*c/A0) ---
+# Valeur critique pour supprimer les réflexions en sortie
+Rc = 1.687e7
 
-###############################################
-#              MODELE WINDKESSEL              #
-#          (Unités SI : Pa, m3/s)             #
-###############################################
+# --- Paramètres physiologiques ---
+Rp = 1.3e8
+C0 = 1.5e-8
+alpha = 0.0003
+Lw = 5000
 
-# --- Résistances ---
-# Rc ajusté pour matcher l'impédance Z0 = (rho*c)/A0
-# Cela minimise les réflexions artificielles à la sortie.
-Rc = 1.69e7         # Résistance caractéristique (Adaptation d'impédance)
-Rp = 1.3e8          # Résistance périphérique (Donne un débit ~6 L/min)
+# --- Paramètres cardiaques ---
+T = 1.0
+Ts = 0.3
+tau = 0.15
+Pmin = 10660
+Pmax = 16000
 
-# --- Compliance & Inertance ---
-C0 = 1.5e-8         # Compliance totale (~2 mL/mmHg - élasticité globale)
-alpha = 0.0003      # Coefficient de non-linéarité (si supporté par le code)
-
-# Lw représente l'inertie du sang dans les petits vaisseaux.
-# 5000 est faible, souvent négligé (Windkessel 3 éléments), mais acceptable pour la stabilité.
-Lw = 5000           
-
-###############################################
-#           PARAMETRES CARDIAQUES             #
-###############################################
-
-T = 1.0             # Durée cycle (s) - 60 battements/min
-Ts = 0.3            # Durée systole (s) - Ratio physiologique normal
-tau = 0.15          # Constante de temps de relaxation ventriculaire
-
-# Pressions cibles (pour condition limite entrée ou validation)
-Pmin = 10660        # ~80 mmHg (Diastole)
-Pmax = 16000        # ~120 mmHg (Systole)
-
-###############################################
-#        PARAMETRES NUMERIQUES EDP/EDO        #
-###############################################
-
-# Critère CFL : dt <= dx / c
-# dx = 0.3 / 500 = 0.0006 m
-# dt_max = 0.0006 / 5.0 = 0.00012 s
-# Votre dt = 0.0001 respecte la condition CFL (CFL ~0.83).
-
-Nx = 500            # Maillage spatial fin
-dt = 0.0001         # Pas de temps (s) - Stable
-t_final = 5  # Augmenté à 5s pour atteindre un état périodique établi (5 cycles)
-output_frequency = 10 # Écrire à chaque pas ralentit trop (10 ou 20 est mieux)
+# --- Numérique (CFL = 0.5 pour stabilité max) ---
+Nx = 300
+dt = 0.0001
+t_final = 3.0
+output_frequency = 10
