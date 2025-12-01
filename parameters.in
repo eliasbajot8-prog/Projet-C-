@@ -49,5 +49,5 @@ Pmax = 16000        # ~120 mmHg (Systole)
 
 Nx = 500            # Maillage spatial fin
 dt = 0.0001         # Pas de temps (s) - Stable
-t_final = 2  # Augmenté à 5s pour atteindre un état périodique établi (5 cycles)
+t_final = 5  # Augmenté à 5s pour atteindre un état périodique établi (5 cycles)
 output_frequency = 10 # Écrire à chaque pas ralentit trop (10 ou 20 est mieux)
