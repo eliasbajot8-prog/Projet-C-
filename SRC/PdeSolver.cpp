@@ -64,8 +64,11 @@ void PdeSolver::step(double /*t*/, double P_left, double P_right)
     // 2) Points intérieurs : Lax–Wendroff
     // ----------------------------
     double cc = c * c;
-    double coefP = cc * dt * dt / (2.0 * dx * dx);
-    double coefU = cc * dt * dt / (2.0 * dx * dx);
+    double dtdt = dt * dt;
+    double dxdx = dx * dx;
+
+    double coefP = cc * dtdt / (2.0 * dxdx);
+    double coefU = cc * dtdt / (2.0 * dxdx);
     double coef1 = rho * cc * dt / (2.0 * dx);
     double coef2 = dt / (2.0 * rho * dx);
 

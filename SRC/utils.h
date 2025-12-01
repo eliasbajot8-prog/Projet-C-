@@ -35,8 +35,6 @@ public:
     double getTfinal() const { return t_final; }
     int getOutputFrequency() const { return output_frequency; }
 
-    // Tu peux aussi ajouter des setters si besoin
-
 private: // (Valeurs par défaut)
     // Physique
     double rho = 1060.0;
@@ -72,3 +70,10 @@ private: // (Valeurs par défaut)
 void write_vector_csv(const std::string &filename, const std::vector<double> &vec);
 
 void write_two_vectors_csv(const std::string &filename, const std::vector<double> &x, const std::vector<double> &y);
+
+double compute_error_l2(const std::vector<double> &P_num,
+                        const std::vector<double> &x,
+                        double t,
+                        double c,
+                        double Lx,
+                        double P_base);

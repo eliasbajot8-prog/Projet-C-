@@ -34,5 +34,5 @@ plt.legend()
 plt.grid(True, alpha=0.5)
 
 plt.tight_layout()
-plt.savefig('WK_coupled_alpha=0,0003.png', dpi=300)
+plt.savefig('WK_coupled_test.png', dpi=300)
 plt.show()

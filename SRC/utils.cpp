@@ -104,3 +104,43 @@ void write_two_vectors_csv(const std::string &filename, const std::vector<double
         file << x[i] << "," << y[i] << '\n';
     }
 }
+
+#include <cmath>
+
+// Calcule l'erreur L2 relative (en %)
+double compute_error_l2(const std::vector<double> &P_num,
+                        const std::vector<double> &x,
+                        double t,
+                        double c,
+                        double Lx,
+                        double P_base) // Pression de base (Pmin)
+{
+    double error_sum = 0.0;
+    double ref_sum = 0.0;
+
+    // Paramètres de la Gaussienne initiale (doivent être les mêmes que dans initialize)
+    double center_init = Lx / 2.0;
+    double width = 0.02;
+    double Amp = 1000.0; // Amplitude de la perturbation
+
+    for (size_t i = 0; i < P_num.size(); ++i)
+    {
+        // 1. Calculer la position théorique du centre de la bosse à l'instant t
+        // (Le fmod gère la périodicité : si l'onde sort à droite, elle revient à gauche)
+        double center_t = std::fmod(center_init + c * t, Lx);
+
+        // 2. Calculer la solution EXACTE à cet endroit
+        // Astuce : pour la périodicité parfaite, il faut gérer la distance minimale sur le cercle
+        double dist = std::abs(x[i] - center_t);
+        if (dist > Lx / 2.0)
+            dist = Lx - dist; // Gestion bord périodique
+
+        double P_exact = P_base + Amp * std::exp(-(dist * dist) / (2.0 * width * width));
+
+        // 3. Somme des carrés
+        error_sum += std::pow(P_num[i] - P_exact, 2);
+        ref_sum += std::pow(P_exact, 2);
+    }
+
+    return std::sqrt(error_sum / ref_sum); // Erreur relative
+}

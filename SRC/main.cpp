@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <cmath>
 #include "utils.h"
 #include "coupling.h"
 
@@ -50,7 +51,7 @@ int main(int argc, char **argv)
         // Sauvegarde des données WK
         t_save.push_back(t);
         P_wk_save.push_back(system.getP_wk());
-        Q_wk_save.push_back(system.getQ_out_PDE());
+        Q_wk_save.push_back(system.getQ_wk());
 
         t += dt;
         step_count++;
@@ -73,27 +74,9 @@ int main(int argc, char **argv)
         double Q_in = 0.0;
         double t_loc = std::fmod(t, params.getT());
 
-        // --- Simulation d'un débit réaliste (Triangulaire asymétrique) ---
         if (t_loc < params.getTs())
         {
-            double Q_max = 5.0e-4;                // 500 mL/s en pointe (plus puissant)
-            double T_peak = params.getTs() * 0.3; // Le pic arrive à 30% de la systole (montée rapide)
-
-            if (t_loc < T_peak)
-            {
-                // Montée rapide
-                Q_in = Q_max * (t_loc / T_peak);
-            }
-            else
-            {
-                // Descente plus lente
-                Q_in = Q_max * (params.getTs() - t_loc) / (params.getTs() - T_peak);
-            }
-        }
-        else
-        {
-            // Diastole (Débit nul, valves fermées)
-            Q_in = 0.0;
+            Q_in = 2.0e-4 * std::sin(M_PI * t_loc / params.getTs());
         }
 
         wk_model.set_Q_in(Q_in);
@@ -113,6 +96,16 @@ int main(int argc, char **argv)
     write_two_vectors_csv("data/Q_wk_alone.csv", t_wk_save, Q_wk_alone_save);
 
     std::cout << "[OK] Couplage PDE / Windkessel terminé." << std::endl;
+
+    // Calcul d'erreur L2
+    double erreur = compute_error_l2(system.getPde().getP(),
+                                     system.getPde().getX(),
+                                     t_final,
+                                     params.getCelerity(),
+                                     params.getLx(),
+                                     params.getPmin());
+    std::cout << "Erreur L2 relative sur la pression : " << erreur << " %" << std::endl;
+    std::cout << "Delta x vaut : " << system.getPde().getDx() << std::endl;
 
     return 0;
 }
